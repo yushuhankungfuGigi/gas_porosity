@@ -12,10 +12,11 @@ def calculate_porus(csv,threshold):
     n_peaks_dict = {}
     magnitude_dict = {}
     integral_dict = {}
-    first_time = datetime.datetime.strptime(data["Timestamp"][0], "%H:%M:%S.%f")
-    data= data.drop("Unnamed: 97",axis=1)
+    first_time = datetime.datetime.strptime(data["Timestamp"][0], "%H:%M:%S")
+    unnamed_cols = [c for c in data.columns if c.startswith("Unnamed")]
+    data = data.drop(columns=unnamed_cols)
     data["Timestamp"] = data["Timestamp"].apply(
-        lambda x: (datetime.datetime.strptime(x, "%H:%M:%S.%f")-first_time).total_seconds())
+        lambda x: (datetime.datetime.strptime(x, "%H:%M:%S")-first_time).total_seconds())
     for column in data.columns:
         if column == "Timestamp":
             continue
@@ -37,7 +38,7 @@ def calculate_porus(csv,threshold):
             print(f"No peaks found for {column}")
             integrals = []
         else:
-           
+            integrals = []
             for peak in peaks:
                 integrals.append(integrate.trapezoid(filtered[peak-30:peak+300],data["Timestamp"][peak-30:peak + 300]))
                 #minus the square
