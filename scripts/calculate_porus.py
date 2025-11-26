@@ -20,8 +20,8 @@ def calculate_porus(csv,threshold):
         if column == "Timestamp":
             continue
             
-        normalized = data[column] - data[column][0]
-        normalized = normalized + abs(min(normalized))
+        ref_norm = data[normalize_well] - data[normalize_well].iloc[0]
+        normalized = (data[column] - data[column].iloc[0]) - ref_norm
         filtered = signal.medfilt(normalized,kernel_size=5)
         fig.add_trace(
             go.Scatter(
@@ -32,6 +32,7 @@ def calculate_porus(csv,threshold):
             )
         )
         peaks = signal.find_peaks(filtered, height=threshold, distance=200)[0]
+        #filtered[0:300]
         
         if len(peaks) == 0:
             print(f"No peaks found for {column}")
